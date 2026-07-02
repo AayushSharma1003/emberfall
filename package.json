@@ -1,0 +1,12 @@
+{
+  "name": "emberfall",
+  "version": "1.0.0",
+  "description": "EMBERFALL — a 2D knights & mages action game with online 1v1 duels and 1-3 player co-op story mode.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

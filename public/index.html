@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMBERFALL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d090c; --panel:#181015; --panel2:#221419; --line:#4a3226; --line2:#6b4630;
+  --ember:#ff8c3f; --deep:#c9502a; --ink:#e9dcc3; --mut:#9a8878;
+  --knight:#e8b04a; --mage:#82b6ff; --ranger:#9dc46a;
+  --danger:#d8574a;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Alegreya', Georgia, serif; font-size:17px; line-height:1.45;
+  overflow:hidden;
+}
+body::before{ /* faint ash texture */
+  content:''; position:fixed; inset:0; pointer-events:none; opacity:.05; z-index:0;
+  background-image:radial-gradient(#fff 0.6px, transparent 0.6px); background-size:7px 7px;
+}
+h1,h2,h3,.disp{font-family:'Cinzel', 'Alegreya', serif; letter-spacing:.06em}
+button{
+  font-family:'Cinzel', serif; font-weight:700; letter-spacing:.08em;
+  background:var(--panel2); color:var(--ink); border:1px solid var(--line2);
+  padding:10px 22px; font-size:15px; cursor:pointer; transition:all .12s ease;
+}
+button:hover{border-color:var(--ember); color:var(--ember); box-shadow:0 0 14px rgba(255,140,63,.18)}
+button:disabled{opacity:.35; cursor:default; box-shadow:none}
+button:disabled:hover{border-color:var(--line2); color:var(--ink)}
+button.primary{background:linear-gradient(180deg,#5a2c17,#3a1c10); border-color:var(--deep); color:#ffd9b0}
+button.primary:hover{border-color:var(--ember); color:#fff}
+input[type=text]{
+  background:#0a0709; border:1px solid var(--line); color:var(--ink);
+  padding:9px 12px; font-family:'Alegreya', serif; font-size:17px; outline:none; width:100%;
+}
+input[type=text]:focus{border-color:var(--ember)}
+input[type=color]{width:44px; height:34px; border:1px solid var(--line2); background:#0a0709; padding:2px; cursor:pointer}
+.screen{
+  position:fixed; inset:0; display:none; z-index:2;
+  align-items:center; justify-content:center; flex-direction:column; gap:18px;
+  overflow:auto; padding:26px;
+}
+.screen.on{display:flex}
+.panel{
+  background:var(--panel); border:1px solid var(--line); padding:26px 30px;
+  box-shadow:0 0 0 1px #000, 0 18px 60px rgba(0,0,0,.6);
+  max-width:860px; width:100%;
+}
+.eyebrow{font-family:'Cinzel',serif; font-size:12px; letter-spacing:.34em; color:var(--mut); text-transform:uppercase}
+.rule{height:1px; background:linear-gradient(90deg, transparent, var(--line2), transparent); margin:14px 0}
+.mut{color:var(--mut)} .small{font-size:14px}
+.row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+.grow{flex:1}
+/* ---------- MENU ---------- */
+#title-wrap{position:relative; text-align:center; user-select:none}
+#title-cv{position:absolute; inset:-60px -120px; width:calc(100% + 240px); height:calc(100% + 120px); pointer-events:none; z-index:-1}
+#game-title{font-size:clamp(44px, 8vw, 84px); font-weight:900; color:var(--ink);
+  text-shadow:0 0 30px rgba(255,140,63,.35), 0 2px 0 #000; line-height:1}
+#game-title span{color:var(--ember)}
+#tagline{color:var(--mut); font-style:italic; margin-top:2px}
+.cls-row{display:flex; gap:10px; justify-content:center}
+.cls-btn{min-width:120px; position:relative}
+.cls-btn.sel{border-color:var(--ember); color:var(--ember); box-shadow:0 0 16px rgba(255,140,63,.25)}
+#cls-desc{min-height:44px; text-align:center; font-style:italic; color:var(--mut); font-size:15px}
+.menu-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media(max-width:700px){.menu-grid{grid-template-columns:1fr}}
+.mode-card{background:var(--panel2); border:1px solid var(--line); padding:16px 18px}
+.mode-card h3{color:var(--ember); font-size:17px; margin-bottom:4px}
+.mode-card p{font-size:14px; color:var(--mut); margin-bottom:12px}
+#controls-help{font-size:14px; color:var(--mut); text-align:center}
+kbd{background:#241a1f; border:1px solid var(--line2); border-bottom-width:2px; padding:1px 7px; font-family:'Cinzel'; font-size:12px; color:var(--ink)}
+/* ---------- CUSTOMIZE ---------- */
+#cv-prev{background:radial-gradient(ellipse at 50% 80%, #241419, #0c080b 75%); border:1px solid var(--line); display:block; margin:0 auto}
+.opt-line{display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px dashed #2c1d22}
+.opt-line .lbl{width:150px; color:var(--mut); font-size:15px}
+/* ---------- SHOP ---------- */
+#shop-list{display:grid; grid-template-columns:1fr 1fr; gap:10px; max-height:52vh; overflow:auto; padding-right:6px}
+@media(max-width:760px){#shop-list{grid-template-columns:1fr}}
+.shop-item{background:var(--panel2); border:1px solid var(--line); padding:12px 14px; display:flex; gap:10px; align-items:center}
+.shop-item .nm{font-family:'Cinzel'; font-size:15px}
+.shop-item .ds{font-size:13px; color:var(--mut)}
+.shop-item.owned{border-color:#3d5a35}
+.coin{color:var(--ember); font-family:'Cinzel'; font-weight:700}
+.coin::before{content:'◈ '; color:var(--ember)}
+/* ---------- LOBBY ---------- */
+#lb-code{font-size:52px; font-weight:900; color:var(--ember); letter-spacing:.3em; text-align:center;
+  text-shadow:0 0 24px rgba(255,140,63,.4)}
+.lb-player{display:flex; gap:12px; align-items:center; background:var(--panel2); border:1px solid var(--line); padding:10px 14px; margin-bottom:8px}
+.lb-dot{width:14px; height:14px; border-radius:50%; box-shadow:0 0 8px currentColor}
+#lb-missions{display:flex; flex-direction:column; gap:6px; max-height:34vh; overflow:auto}
+.msn{display:flex; gap:10px; align-items:baseline; background:var(--panel2); border:1px solid var(--line); padding:9px 13px; cursor:pointer; font-size:15px}
+.msn:hover{border-color:var(--line2)}
+.msn.sel{border-color:var(--ember)}
+.msn.lock{opacity:.4; cursor:default}
+.msn .n{font-family:'Cinzel'; color:var(--ember); width:26px}
+/* ---------- GAME ---------- */
+#s-game{padding:0; background:#000}
+#cv-wrap{position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center}
+#cv{background:#000; max-width:100%; max-height:100%; aspect-ratio:16/9; outline:none}
+#dlg{
+  position:absolute; left:50%; bottom:6%; transform:translateX(-50%);
+  width:min(760px, 92%); background:rgba(14,9,12,.92); border:1px solid var(--line2);
+  padding:14px 20px; display:none; box-shadow:0 10px 40px rgba(0,0,0,.7); cursor:pointer;
+}
+#dlg.on{display:block}
+#dlg-name{font-family:'Cinzel'; color:var(--ember); font-size:14px; letter-spacing:.18em; text-transform:uppercase}
+#dlg-text{font-size:17px; margin-top:2px}
+#dlg-hint{font-size:12px; color:var(--mut); text-align:right; margin-top:4px}
+#esc{position:absolute; inset:0; background:rgba(5,3,5,.8); display:none; align-items:center; justify-content:center; flex-direction:column; gap:14px; z-index:5}
+#esc.on{display:flex}
+/* ---------- RESULTS ---------- */
+#r-title{font-size:44px; text-align:center}
+#r-sub{text-align:center; color:var(--mut); font-style:italic}
+#r-lines{margin:14px auto; max-width:560px; font-size:16px}
+#r-lines div{display:flex; justify-content:space-between; border-bottom:1px dashed #2c1d22; padding:6px 2px}
+/* ---------- TOAST ---------- */
+#toast{
+  position:fixed; top:22px; left:50%; transform:translateX(-50%) translateY(-8px);
+  background:#2a1512; border:1px solid var(--deep); color:#ffd9b0; padding:10px 22px;
+  font-family:'Cinzel'; font-size:14px; letter-spacing:.06em; opacity:0; pointer-events:none;
+  transition:all .25s ease; z-index:50; max-width:90%;
+}
+#toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:9px} ::-webkit-scrollbar-thumb{background:var(--line); border:2px solid var(--bg)}
+/* ---------- CHRONICLE ---------- */
+#chr-scroll{max-height:62vh; overflow:auto; padding-right:8px}
+.chr-entry{margin-bottom:22px; border-left:2px solid var(--line); padding-left:16px; position:relative}
+.chr-entry::before{content:''; position:absolute; left:-5px; top:6px; width:8px; height:8px; background:var(--ember); border-radius:50%; box-shadow:0 0 10px rgba(255,140,63,.5)}
+.chr-entry.locked::before{background:var(--line); box-shadow:none}
+.chr-entry.locked{border-color:#2a1d1a; opacity:.38}
+.chr-entry h3{font-size:16px; color:var(--ember); margin-bottom:3px; letter-spacing:.08em}
+.chr-entry.locked h3{color:var(--mut)}
+.chr-entry p{font-size:15px; color:var(--ink); line-height:1.55}
+.chr-entry .chr-who{font-family:'Cinzel'; font-size:12px; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; margin-top:6px; margin-bottom:2px}
+.chr-entry .chr-quote{font-style:italic; color:var(--mut); font-size:14.5px; padding-left:12px; border-left:1px solid var(--line)}
+.chr-tabs{display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap}
+.chr-tab{padding:6px 16px; font-size:13px; cursor:pointer}
+.chr-tab.sel{border-color:var(--ember); color:var(--ember); box-shadow:0 0 10px rgba(255,140,63,.15)}
+.chr-ornament{text-align:center; color:var(--line2); font-size:22px; letter-spacing:.4em; margin:8px 0 14px}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+</head>
+<body>
+
+<!-- ============ MAIN MENU ============ -->
+<div class="screen on" id="s-menu">
+  <div id="title-wrap">
+    <canvas id="title-cv"></canvas>
+    <div class="eyebrow">The hymn is rising · take up arms</div>
+    <h1 id="game-title">EMBER<span>FALL</span></h1>
+    <div id="tagline">Knights of the Vigil · Mages of the Scattered College</div>
+  </div>
+
+  <div class="panel" style="max-width:760px">
+    <div class="row">
+      <div class="grow">
+        <div class="eyebrow" style="margin-bottom:6px">Your name</div>
+        <input type="text" id="i-name" maxlength="14" placeholder="Name your hero...">
+      </div>
+      <div style="text-align:right">
+        <div class="eyebrow" style="margin-bottom:6px">Purse</div>
+        <div class="coin" id="m-coins" style="font-size:22px">0</div>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <div class="eyebrow" style="text-align:center; margin-bottom:8px">Choose your calling</div>
+    <div class="cls-row" id="cls-row">
+      <button class="cls-btn" data-cls="knight">Knight</button>
+      <button class="cls-btn" data-cls="mage">Mage</button>
+      <button class="cls-btn" data-cls="ranger">Ranger</button>
+    </div>
+    <p id="cls-desc"></p>
+    <div class="row" style="justify-content:center; margin-bottom:14px">
+      <button id="b-custom">Customize</button>
+      <button id="b-shop">Armory &amp; Shop</button>
+      <button id="b-chronicle">Chronicle</button>
+    </div>
+    <div class="menu-grid">
+      <div class="mode-card">
+        <h3>Story · The Ashen Choir</h3>
+        <p>1–3 players. Six missions across the dying realm of Aldermere. Earn coin, grow strong, silence the hymn.</p>
+        <button class="primary" id="b-story" style="width:100%">Begin a Campaign</button>
+      </div>
+      <div class="mode-card">
+        <h3>Duel · Trial of Embers</h3>
+        <p>1v1, best of three rounds. Pure skill — blocks, parries, dodges. Winner takes the purse.</p>
+        <button class="primary" id="b-duel" style="width:100%">Open a Duel</button>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <div class="row">
+      <input type="text" id="i-code" maxlength="4" placeholder="ROOM CODE" style="text-transform:uppercase; letter-spacing:.3em; font-family:'Cinzel'; max-width:200px; text-align:center">
+      <button id="b-join">Join a Friend</button>
+      <div class="grow"></div>
+    </div>
+    <div class="rule"></div>
+    <div id="controls-help">
+      <kbd>WASD</kbd> move &nbsp; <kbd>J</kbd>/<kbd>Click</kbd> attack &nbsp; <kbd>K</kbd>/<kbd>R-Click</kbd> class skill &nbsp; <kbd>Space</kbd> dodge &nbsp; <kbd>E</kbd> revive/interact &nbsp; <kbd>Esc</kbd> menu
+      <div class="small" style="margin-top:4px">Knight holds <kbd>K</kbd> to block — press it the instant a blow lands to <span style="color:var(--ember)">parry</span>. Ranger holds <kbd>J</kbd> to charge shots. Mage aims with the mouse.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CUSTOMIZE ============ -->
+<div class="screen" id="s-custom">
+  <div class="panel" style="max-width:640px">
+    <div class="eyebrow">The mirror-forge</div>
+    <h2 style="margin-bottom:12px">Customize</h2>
+    <canvas id="cv-prev" width="360" height="280"></canvas>
+    <div class="rule"></div>
+    <div class="opt-line"><div class="lbl">Primary color</div><input type="color" id="i-c1"><div class="mut small">Armor / robes</div></div>
+    <div class="opt-line"><div class="lbl">Secondary color</div><input type="color" id="i-c2"><div class="mut small">Cloth &amp; underlay</div></div>
+    <div class="opt-line"><div class="lbl">Trim color</div><input type="color" id="i-c3"><div class="mut small">Edging, plume, glow</div></div>
+    <div class="opt-line"><div class="lbl">Headwear</div>
+      <button id="b-helm-prev" style="padding:4px 12px">‹</button>
+      <div id="helm-name" style="min-width:150px; text-align:center"></div>
+      <button id="b-helm-next" style="padding:4px 12px">›</button>
+    </div>
+    <div class="opt-line"><div class="lbl">Vigil cape</div><button id="b-cape" style="padding:5px 14px; font-size:13px"></button></div>
+    <div class="opt-line"><div class="lbl">Ember trail</div><button id="b-trail" style="padding:5px 14px; font-size:13px"></button></div>
+    <div class="row" style="justify-content:center; margin-top:16px"><button class="primary" id="b-custom-done">Done</button></div>
+  </div>
+</div>
+
+<!-- ============ SHOP ============ -->
+<div class="screen" id="s-shop">
+  <div class="panel" style="max-width:820px">
+    <div class="row">
+      <div class="grow"><div class="eyebrow">Quartermaster of the Vigil</div><h2>Armory &amp; Shop</h2></div>
+      <div class="coin" id="shop-coins" style="font-size:24px">0</div>
+    </div>
+    <p class="mut small" style="margin:6px 0 12px">Coin is earned in missions and duels. Gear and training carry into every fight.</p>
+    <div id="shop-list"></div>
+    <div class="row" style="justify-content:center; margin-top:16px"><button class="primary" id="b-shop-done">Done</button></div>
+  </div>
+</div>
+
+<!-- ============ CHRONICLE ============ -->
+<div class="screen" id="s-chronicle">
+  <div class="panel" style="max-width:780px">
+    <div class="eyebrow">The Archivist's Record</div>
+    <h2 style="margin-bottom:4px">Chronicle of Aldermere</h2>
+    <p class="mut small" style="margin-bottom:10px; font-style:italic">What is known. What was lost. What must be silenced.</p>
+    <div class="chr-tabs" id="chr-tabs"></div>
+    <div class="rule"></div>
+    <div class="chr-ornament">— ◆ —</div>
+    <div id="chr-scroll"></div>
+    <div class="row" style="justify-content:center; margin-top:16px"><button class="primary" id="b-chr-done">Done</button></div>
+  </div>
+</div>
+
+<!-- ============ LOBBY ============ -->
+<div class="screen" id="s-lobby">
+  <div class="panel" style="max-width:680px">
+    <div class="eyebrow" style="text-align:center">Muster your party — share this room code</div>
+    <div id="lb-code">····</div>
+    <div class="rule"></div>
+    <div id="lb-players"></div>
+    <div class="rule"></div>
+    <div id="lb-host-opts">
+      <div class="eyebrow" style="margin-bottom:8px" id="lb-pick-label">Choose the mission</div>
+      <div id="lb-missions"></div>
+      <p id="lb-blurb" class="mut small" style="font-style:italic; margin-top:10px; min-height:40px"></p>
+    </div>
+    <div id="lb-wait" class="mut" style="display:none; text-align:center; font-style:italic">Waiting for the host to sound the horn…</div>
+    <div class="row" style="justify-content:center; margin-top:14px">
+      <button class="primary" id="b-start">Sound the Horn</button>
+      <button id="b-leave">Leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GAME ============ -->
+<div class="screen" id="s-game">
+  <div id="cv-wrap">
+    <canvas id="cv" width="1280" height="720" tabindex="0"></canvas>
+    <div id="dlg"><div id="dlg-name"></div><div id="dlg-text"></div><div id="dlg-hint">click / any key ▸</div></div>
+    <div id="esc">
+      <h2 class="disp">Catch your breath</h2>
+      <p class="mut small">The battle rages on without you — there is no pausing fate.</p>
+      <button class="primary" id="b-resume">Return to Battle</button>
+      <button id="b-quit">Abandon (leave room)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div class="screen" id="s-results">
+  <div class="panel" style="max-width:620px">
+    <h2 id="r-title">Victory</h2>
+    <p id="r-sub"></p>
+    <div id="r-lines"></div>
+    <div class="row" style="justify-content:center; margin-top:14px">
+      <button class="primary" id="b-r-lobby">Back to Lobby</button>
+      <button id="b-r-menu">Main Menu</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="game.js"></script>
+</body>
+</html>
