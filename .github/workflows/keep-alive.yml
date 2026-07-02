@@ -1,0 +1,22 @@
+name: Keep EMBERFALL awake
+
+# Pings the deployed server every 10 minutes so Render's free tier never
+# spins it down mid-session. Update SERVER_URL below once you have your
+# real Render URL.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # every 10 minutes
+  workflow_dispatch: {}      # lets you trigger it manually from the Actions tab
+
+env:
+  SERVER_URL: https://emberfall.onrender.com
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping server
+        run: |
+          echo "Pinging $SERVER_URL"
+          curl -sS -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" "$SERVER_URL" || echo "Ping failed (server may be cold-starting) — this is fine, next run will catch it."
