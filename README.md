@@ -12,7 +12,9 @@
 
 <br/>
 
-![Play](https://img.shields.io/badge/▶_PRESS_START-Play_Now-FF8C3F?style=for-the-badge&labelColor=1a0f0a)
+[![Play](https://img.shields.io/badge/▶_PRESS_START-Play_Now-FF8C3F?style=for-the-badge&labelColor=1a0f0a)](https://emberfall-30x3.onrender.com)
+&nbsp;
+![Version](https://img.shields.io/badge/VERSION-1.0.0-c9502a?style=for-the-badge&labelColor=1a0f0a)
 &nbsp;
 ![Players](https://img.shields.io/badge/PLAYERS-1--3_CO--OP_·_1v1-c9502a?style=for-the-badge&labelColor=1a0f0a)
 &nbsp;
